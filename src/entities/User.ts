@@ -74,7 +74,8 @@ class User extends BaseEntity {
   @ManyToOne(type => Chat, chat => chat.participants)
   chat: Chat;
 
-  @OneToMany(type => Message, message => )
+  @OneToMany(type => Message, message => message.user)
+  messages: Message[];
 
   get fullName(): string {
     return `${this.firstName} ${this.lastName}`;
