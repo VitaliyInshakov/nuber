@@ -19,7 +19,7 @@ class Message extends BaseEntity {
   chat: Chat;
 
   @ManyToOne(type => User, user => user.messages)
-  user: User[];
+  user: User;
 
   @Column({type: "text"})
   text: string;
