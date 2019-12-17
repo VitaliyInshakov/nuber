@@ -2,6 +2,7 @@ import { Resolvers } from "src/types/resolvers";
 import { CompletePhoneVerificationMutationArgs, CompletePhoneVerificationResponse } from "src/types/graph";
 import Verification from "src/entities/Verification";
 import User from "src/entities/User";
+import createJWT from "src/utils/createJWT";
 
 const resolvers: Resolvers = {
   Mutation: {
@@ -40,10 +41,12 @@ const resolvers: Resolvers = {
         if (user) {
           user.verifiedPhoneNumber = true;
           user.save();
+
+          const token = createJWT(user.id);
           return {
             ok: true,
             error: null,
-            token: "Coming soon",
+            token,
           };
         } else {
           return {

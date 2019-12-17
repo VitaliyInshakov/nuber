@@ -1,6 +1,7 @@
 import { Resolvers } from "src/types/resolvers";
 import User from "src/entities/User";
 import { FacebookConnectMutationArgs, FacebookConnectResponse } from "src/types/graph";
+import createJWT from "src/utils/createJWT";
 
 const resolvers: Resolvers = {
   Mutation: {
@@ -10,10 +11,11 @@ const resolvers: Resolvers = {
         const existingUser = await User.findOne({ fbId });
 
         if(existingUser) {
+          const token = createJWT(existingUser.id);
           return {
             ok: true,
             error: null,
-            token: "",
+            token,
           };
         }
       } catch (error) {
@@ -26,15 +28,16 @@ const resolvers: Resolvers = {
 
       // if user is not exist, try create a new user
       try {
-        await User.create({
+        const newUser = await User.create({
           ...args, 
           profilePhoto: `https://graph.facebook.com/${fbId}/picture?type=square`
         }).save();
 
+        const token = createJWT(newUser.id);
         return {
           ok: true,
           error: null,
-          token: "",
+          token,
         };
       } catch (error) {
         return {
