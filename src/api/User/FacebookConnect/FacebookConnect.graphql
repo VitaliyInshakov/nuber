@@ -12,7 +12,3 @@ type Mutation {
     fbId: String!
   ): FacebookConnectResponse!
 }
-
-type Query {
-  sayhello: FacebookConnectResponse!
-}
