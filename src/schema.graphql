@@ -57,6 +57,8 @@ type Mutation {
   FacebookConnect(firstName: String!, lastName: String!, email: String!, fbId: String!): FacebookConnectResponse!
   PhoneVerification(phoneNumber: String!): PhoneVerificationResponse!
   RequestEmailVerification: RequestEmailVerificationResponse!
+  ToggleDrivingMode: ToggleDrivingModeResponse!
+  UpdateProfile(firstName: String, lastName: String, email: String, password: String, profilePhoto: String, age: Int): UpdateProfileResponse
 }
 
 type CompletePhoneVerificationResponse {
@@ -128,6 +130,16 @@ type User {
   messages: [Message]
   rideAsPassenger: [Ride]
   rideAsDriver: [Ride]
+}
+
+type ToggleDrivingModeResponse {
+  ok: Boolean!
+  error: String
+}
+
+type UpdateProfileResponse {
+  ok: Boolean!
+  error: String
 }
 
 type Verification {
