@@ -15,6 +15,7 @@ import bcrypt from "bcrypt";
 import Chat from "./Chat";
 import Message from "./Message";
 import Ride from "./Ride";
+import Place from "./Place";
 
 const BCRYPT_ROUNDS = 10;
 
@@ -82,10 +83,13 @@ class User extends BaseEntity {
   messages: Message[];
 
   @OneToMany(type => Ride, ride => ride.passenger)
-  rideAsPassenger: Ride[]
+  rideAsPassenger: Ride[];
 
   @OneToMany(type => Ride, ride => ride.driver)
-  rideAsDriver: Ride[]
+  rideAsDriver: Ride[];
+
+  @OneToMany(type => Place, place => place.user)
+  places: Place[];
 
   get fullName(): string {
     return `${this.firstName} ${this.lastName}`;

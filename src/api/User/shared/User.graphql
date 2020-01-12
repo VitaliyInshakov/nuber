@@ -23,4 +23,5 @@ type User {
   messages: [Message]
   rideAsPassenger: [Ride]
   rideAsDriver: [Ride]
+  places: [Place]
 }
