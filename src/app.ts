@@ -18,6 +18,7 @@ class App {
         context: req => {
           return {
             req: req.request,
+            pubsub: this.pubSub,
           }
         },
       });
