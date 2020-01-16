@@ -10,7 +10,7 @@ const resolvers: Resolvers = {
             parent,
             args,
             { req },
-        ): GetNearbyDriversResponse => {
+        ): Promise<GetNearbyDriversResponse> => {
             const user: User = req.user;
             const { lastLat, lastLng } = user;
             try {

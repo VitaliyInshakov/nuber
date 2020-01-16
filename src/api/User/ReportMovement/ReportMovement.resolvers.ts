@@ -9,13 +9,14 @@ const resolvers: Resolvers = {
     ReportMovement: privateResolver(async (
       parent,
       args: ReportMovementMutationArgs,
-      { req },
+      { req, pubsub },
     ): Promise<ReportMovementResponse> => {
       const user: User = req.user;
       const notNull = cleanNullArgs(args);
 
       try {
         await User.update({id: user.id}, {...notNull});
+        pubsub.publish("driverUpdate", { DriversSubscription: user });
         return {
           ok: true,
           error: null,
