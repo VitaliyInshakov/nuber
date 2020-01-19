@@ -16,7 +16,8 @@ const resolvers: Resolvers = {
 
       try {
         await User.update({id: user.id}, {...notNull});
-        pubsub.publish("driverUpdate", { DriversSubscription: user });
+        const updatedUser = await User.findOne({ id: user.id });
+        pubsub.publish("driverUpdate", { DriversSubscription: updatedUser });
         return {
           ok: true,
           error: null,
