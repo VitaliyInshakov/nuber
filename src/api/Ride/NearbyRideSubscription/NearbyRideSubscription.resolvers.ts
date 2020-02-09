@@ -3,27 +3,27 @@ import User from "../../../entities/User";
 
 const resolvers = {
     Subscription: {
-        DriversSubscription: {
+        NearbyRideSubscription: {
             subscribe: withFilter(
-                (_, __, { pubsub }) => pubsub.asyncIterator("driverUpdate"),
+                (_, __, { pubsub }) => pubsub.asyncIterator("rideRequest"),
                 (payload, _, { context }) => {
                     const user: User = context.currentUser;
                     const {
-                        DriversSubscription: {
-                            lastLat: driverLastLat,
-                            lastLng: driverLastLng,
+                        NearbyRideSubscription: {
+                            pickUpLat,
+                            pickUpLng,
                         }
                     } = payload;
 
                     const { lastLng: userLastLng, lastLat: userLastLat } = user;
                     return (
-                        driverLastLat >= userLastLat - 0.05
-                        && driverLastLat <= userLastLat + 0.05
-                        && driverLastLng >= userLastLng - 0.05
-                        && driverLastLng <= userLastLng + 0.05
+                        pickUpLat >= userLastLat - 0.05
+                        && pickUpLat <= userLastLat + 0.05
+                        && pickUpLng >= userLastLng - 0.05
+                        && pickUpLng <= userLastLng + 0.05
                     )
                 },
-            ),
+            )
         }
     }
 };
