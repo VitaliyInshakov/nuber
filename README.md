@@ -4,3 +4,6 @@
 GraphQL, Typescript, NodeJs
 
 ---
+
+##Client:
+ReactJS, Apollo, Typescript
