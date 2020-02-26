@@ -8,7 +8,7 @@ import GlobalStyle from "../../global-styles";
 import theme from "../../theme";
 
 import Presenter from "./Presenter";
-import { IS_LOGGED_IN } from "./Queries";
+import { IS_LOGGED_IN } from "./Queries.local";
 
 const Container = ({ data }: { data?: any;}) => (
     <>
