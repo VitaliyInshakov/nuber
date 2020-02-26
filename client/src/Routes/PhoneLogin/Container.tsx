@@ -1,51 +1,54 @@
-import React from "react";
-import { RouteComponentProps } from "react-router-dom";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
+import { useMutation } from "@apollo/react-hooks";
 
 import Presenter from "./Presenter";
+import { PHONE_SIGN_IN } from "./Queries";
 
 interface IState {
     countryCode: string;
     phoneNumber: string;
 }
 
-class PhoneLoginContainer extends React.Component<RouteComponentProps<any>, IState> {
-    public state = {
+const PhoneLoginContainer: React.FC<any> = (props) => {
+    const [state, setState] = useState<IState>({
         countryCode: "+82",
         phoneNumber: "",
-    };
+    });
 
-    public onInputChange: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement> = (event) => {
+    const [mutation, { loading }] = useMutation(PHONE_SIGN_IN);
+
+    const onInputChange: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement> = (event) => {
         const { target: { name, value } } = event;
 
-        this.setState({
+        setState(prevState => ({
+            ...prevState,
             [name]: value,
-        } as any);
+        }));
     };
 
-    public onSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
+    const onSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
         event.preventDefault();
-        const { countryCode, phoneNumber } = this.state;
+        const { countryCode, phoneNumber } = state;
 
         const phone = `${countryCode}${phoneNumber}`;
         const isValid = /^\+[1-9]{1}[0-9]{7,11}$/.test(phone);
 
         if (isValid) {
-
+            mutation({ variables: { phoneNumber: phone } });
         } else {
             toast.error("Please write a valid phone number");
         }
     };
 
-    public render() {
-        const { countryCode, phoneNumber } = this.state;
-        return <Presenter
-            countryCode={countryCode}
-            phoneNumber={phoneNumber}
-            onInputChange={this.onInputChange}
-            onSubmit={this.onSubmit}
-        />;
-    }
-}
+    const { countryCode, phoneNumber } = state;
+    return <Presenter
+        countryCode={countryCode}
+        phoneNumber={phoneNumber}
+        onInputChange={onInputChange}
+        onSubmit={onSubmit}
+        loading={loading}
+    />;
+};
 
 export default PhoneLoginContainer;

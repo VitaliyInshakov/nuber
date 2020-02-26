@@ -59,9 +59,16 @@ interface IProps {
     phoneNumber: string;
     onInputChange: (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+    loading: boolean;
 }
 
-const Presenter: React.FC<IProps> = ({ countryCode, phoneNumber, onInputChange, onSubmit }) => (
+const Presenter: React.FC<IProps> = ({
+    countryCode,
+    phoneNumber,
+    onInputChange,
+    onSubmit,
+    loading,
+}) => (
     <Container>
         <Helmet>
             <title>Phone Login | Number</title>
@@ -78,15 +85,27 @@ const Presenter: React.FC<IProps> = ({ countryCode, phoneNumber, onInputChange, 
         <Form onSubmit={onSubmit}>
             <Input placeholder={"053 690 2129"} value={phoneNumber} name="phoneNumber" onChange={onInputChange} />
             <Button>
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill={"white"}
-                >
-                    <path d="M7.33 24l-2.83-2.829 9.339-9.175-9.339-9.167 2.83-2.829 12.17 11.996z" />
-                </svg>
+                {loading ? (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill={"white"}
+                    >
+                        <path d="M7.33 24l-2.83-2.829 9.339-9.175-9.339-9.167 2.83-2.829 12.17 11.996z" />
+                    </svg>
+                ) : (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill={"white"}
+                    >
+                        <path d="M7.33 24l-2.83-2.829 9.339-9.175-9.339-9.167 2.83-2.829 12.17 11.996z" />
+                    </svg>
+                )}
             </Button>
         </Form>
     </Container>
