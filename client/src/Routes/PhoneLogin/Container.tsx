@@ -1,22 +1,35 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import { RouteComponentProps } from "react-router-dom";
 import { useMutation } from "@apollo/react-hooks";
 
 import Presenter from "./Presenter";
 import { PHONE_SIGN_IN } from "./Queries";
+import { phoneVerification, phoneVerificationVariables } from "../../types/api";
 
 interface IState {
     countryCode: string;
     phoneNumber: string;
 }
 
-const PhoneLoginContainer: React.FC<any> = (props) => {
+const PhoneLoginContainer: React.FC<RouteComponentProps<any>> = (props) => {
     const [state, setState] = useState<IState>({
         countryCode: "+82",
         phoneNumber: "",
     });
 
-    const [mutation, { loading }] = useMutation(PHONE_SIGN_IN);
+    const [mutation, { loading }] = useMutation<phoneVerification, phoneVerificationVariables>(
+        PHONE_SIGN_IN,
+        {onCompleted: data => {
+            const { PhoneVerification } = data;
+
+            if (PhoneVerification.ok) {
+                return;
+            } else {
+                toast.error(PhoneVerification.error);
+            }
+        }}
+    );
 
     const onInputChange: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement> = (event) => {
         const { target: { name, value } } = event;
