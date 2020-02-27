@@ -49,6 +49,12 @@ const PhoneLoginContainer: React.FC<RouteComponentProps<any>> = (props) => {
 
         if (isValid) {
             mutation({ variables: { phoneNumber: phone } });
+            props.history.push({
+                pathname: "/verify-phone",
+                state: {
+                    phone,
+                },
+            });
         } else {
             toast.error("Please write a valid phone number");
         }
