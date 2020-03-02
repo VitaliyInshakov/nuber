@@ -24,6 +24,7 @@ const PhoneLoginContainer: React.FC<RouteComponentProps<any>> = (props) => {
             const { PhoneVerification } = data;
 
             if (PhoneVerification.ok) {
+                toast.success("SMS sent!");
                 return;
             } else {
                 toast.error(PhoneVerification.error);

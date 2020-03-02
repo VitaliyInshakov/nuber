@@ -5,10 +5,11 @@ import styled from "styled-components";
 import Button from "../../Components/Button";
 import Header from "../../Components/Header";
 import Input from "../../Components/Input";
+import Form from "../../Components/Form";
 
 const Container = styled.div``;
 
-const Form = styled.form`
+const ExtendedForm = styled(Form)`
   padding: 0px 40px;
 `;
 
@@ -16,20 +17,38 @@ const ExtendedInput = styled(Input)`
   margin-bottom: 20px;
 `;
 
-const Presenter: React.FC = (props) => (
+interface IProps {
+    verificationKey: string;
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onSubmit: any;
+    loading: boolean;
+}
+
+
+const Presenter: React.FC<IProps> = ({
+    verificationKey ,
+    onChange,
+    onSubmit,
+    loading,
+}) => (
     <Container>
         <Helmet>
             <title>Verify Phone | Number</title>
         </Helmet>
         <Header backTo={"/phone-login"} title={"Verify Phone Number"} />
-        <Form>
+        <ExtendedForm submitFn={onSubmit}>
             <ExtendedInput
-                value={""}
+                value={verificationKey}
                 placeholder={"Enter Verification Code"}
-                onChange={null}
+                onChange={onChange}
+                name={"verificationKey"}
             />
-            <Button value={"Submit"} onClick={null} />
-        </Form>
+            <Button
+                value={loading ? "Verifying" : "Submit"}
+                onClick={null}
+                disabled={loading}
+            />
+        </ExtendedForm>
     </Container>
 );
 
