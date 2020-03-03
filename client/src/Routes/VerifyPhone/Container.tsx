@@ -4,7 +4,8 @@ import { useMutation } from "@apollo/react-hooks";
 import { toast } from "react-toastify";
 
 import Presenter from "./Presenter";
-import { VERIFY_PHONE} from "./Queries";
+import { VERIFY_PHONE } from "./Queries";
+import { LOG_USER_IN} from "../../sharedQueries";
 import { verifyPhone, verifyPhoneVariables } from "../../types/api";
 
 interface IState {
@@ -31,12 +32,21 @@ const Container: React.FC<RouteComponentProps<any>> = (props) => {
             const { CompletePhoneVerification } = data;
 
             if (CompletePhoneVerification.ok) {
+                if (CompletePhoneVerification.token) {
+                    logUserIn({
+                        variables: {
+                            token: CompletePhoneVerification.token,
+                        },
+                    });
+                }
                 toast.success("You're verified, loggin in now");
             } else {
                 toast.error(CompletePhoneVerification.error);
             }
         },
     });
+
+    const [logUserIn] = useMutation(LOG_USER_IN);
 
     const onInputChange: React.ChangeEventHandler<HTMLInputElement> = event => {
         const {
