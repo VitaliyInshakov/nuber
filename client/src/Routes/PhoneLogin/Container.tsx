@@ -18,7 +18,7 @@ const PhoneLoginContainer: React.FC<RouteComponentProps<any>> = (props) => {
         phoneNumber: "",
     });
 
-    const [mutation, { loading }] = useMutation<phoneVerification, phoneVerificationVariables>(
+    const [phoneMutation, { loading }] = useMutation<phoneVerification, phoneVerificationVariables>(
         PHONE_SIGN_IN,
         {onCompleted: data => {
             const { PhoneVerification } = data;
@@ -49,7 +49,7 @@ const PhoneLoginContainer: React.FC<RouteComponentProps<any>> = (props) => {
         const isValid = /^\+[1-9]{1}[0-9]{7,11}$/.test(phone);
 
         if (isValid) {
-            mutation({ variables: { phoneNumber: phone } });
+            phoneMutation({ variables: { phoneNumber: phone } });
             props.history.push({
                 pathname: "/verify-phone",
                 state: {
