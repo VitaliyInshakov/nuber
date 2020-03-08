@@ -5,5 +5,5 @@ type GetMyProfileResponse {
 }
 
 type Query {
-  GetMyProfile: GetMyProfileResponse
+  GetMyProfile: GetMyProfileResponse!
 }
