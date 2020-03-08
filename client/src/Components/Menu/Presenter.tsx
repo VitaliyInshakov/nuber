@@ -78,11 +78,13 @@ const ToggleDriving = styled("button")<IToggleProps>`
 interface IProps {
     data?: userProfile;
     loading: boolean;
+    toggleDrivingFn: any;
 }
 
 const Presenter: React.FC<IProps> = ({
     data: { GetMyProfile: { user = null } = {} } = {},
-    loading
+    loading,
+    toggleDrivingFn,
 }) => (
     <Container>
         {!loading &&
@@ -107,7 +109,7 @@ const Presenter: React.FC<IProps> = ({
                 </Header>
                 <SLink to="/trips">Your Trips</SLink>
                 <SLink to="/settings">Settings</SLink>
-                <ToggleDriving isDriving={user.isDriving}>
+                <ToggleDriving isDriving={user.isDriving} onClick={toggleDrivingFn}>
                     {user.isDriving ? "Stop driving" : "Start driving"}
                 </ToggleDriving>
             </>
