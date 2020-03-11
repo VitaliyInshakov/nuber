@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useMutation, useQuery } from "@apollo/react-hooks"
+import { useMutation, useQuery } from "@apollo/react-hooks";
+import axios from "axios";
 
 import { USER_PROFILE } from "../../sharedQueries";
 import Presenter from "./Presenter";
@@ -13,6 +14,7 @@ interface IState {
     lastName: string;
     email: string;
     profilePhoto: string;
+    uploading: boolean;
 }
 
 const Container: React.FC<RouteComponentProps<any>> = () => {
@@ -21,6 +23,7 @@ const Container: React.FC<RouteComponentProps<any>> = () => {
         firstName: "",
         lastName: "",
         profilePhoto: "",
+        uploading: false,
     });
 
     useQuery<userProfile>(USER_PROFILE, {
@@ -41,11 +44,38 @@ const Container: React.FC<RouteComponentProps<any>> = () => {
             } else if (UpdateProfile!.error) {
                 toast.error(UpdateProfile!.error);
             }
-        }
+        },
+        fetchPolicy: "cache-and-network",
     });
 
-    const onInputChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-        const { target: { name, value } } = event;
+    const onInputChange: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
+        const { target: { name, value, files } } = event;
+
+        if (files) {
+            setState(prevState => ({
+                ...prevState,
+                uploading: true,
+            }));
+
+            const formData = new FormData();
+            formData.append("file", files[0]);
+            formData.append("api_key", "286472851459921");
+            formData.append("upload_preset", "n1pxeq2h");
+            formData.append("timestamp", String(Date.now() / 1000));
+
+            const { data: { secure_url } } = await axios.post(
+                "https://api.cloudinary.com/v1_1/duzixnnqd/image/upload",
+                formData
+            );
+
+            if (secure_url) {
+                setState(prevState => ({
+                    ...prevState,
+                    uploading: false,
+                    profilePhoto: secure_url,
+                }));
+            }
+        }
 
         setState(prevState => ({
             ...prevState,
@@ -70,7 +100,7 @@ const Container: React.FC<RouteComponentProps<any>> = () => {
         }
     };
 
-    const { email, firstName, lastName, profilePhoto } = state;
+    const { email, firstName, lastName, profilePhoto, uploading } = state;
     return (
         <Presenter
             email={email}
@@ -80,6 +110,7 @@ const Container: React.FC<RouteComponentProps<any>> = () => {
             onInputChange={onInputChange}
             loading={loading}
             onSubmit={updateProfileFn}
+            uploading={uploading}
         />
     );
 };

@@ -6,6 +6,7 @@ import Button from "../../Components/Button";
 import Form from "../../Components/Form";
 import Header from "../../Components/Header";
 import Input from "../../Components/Input";
+import PhotoInput from "../../Components/PhotoInput";
 
 const Container = styled.div``;
 
@@ -25,6 +26,7 @@ interface IProps {
     onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     loading: boolean;
     onSubmit: any;
+    uploading: boolean;
 }
 
 const Presenter: React.FC<IProps> = ({
@@ -35,6 +37,7 @@ const Presenter: React.FC<IProps> = ({
     onInputChange,
     loading,
     onSubmit,
+    uploading,
 }) => {
     return (
         <Container>
@@ -43,6 +46,11 @@ const Presenter: React.FC<IProps> = ({
             </Helmet>
             <Header title={"Edit Account"} backTo={"/"} />
             <ExtendedForm submitFn={onSubmit}>
+                <PhotoInput
+                    uploading={uploading}
+                    fileUrl={profilePhoto}
+                    onChange={onInputChange}
+                />
                 <ExtendedInput
                     onChange={onInputChange}
                     type={"text"}
