@@ -19,8 +19,8 @@ const Container: React.FC<RouteComponentProps<any>> = ({ history }) => {
     const [state, setState] = useState<IState>({
         address: "",
         name: "",
-        lat: 1.34,
-        lng: 1.34,
+        lat: 0,
+        lng: 0,
     });
 
     const [addPlaceFn, { loading }] = useMutation<addPlace, addPlaceVariables>(ADD_PLACE, {
@@ -62,6 +62,7 @@ const Container: React.FC<RouteComponentProps<any>> = ({ history }) => {
             name={state.name}
             loading={loading}
             onSubmit={addPlaceFn}
+            pickedAddress={state.lat !== 0 && state.lng !== 0}
         />
     );
 };

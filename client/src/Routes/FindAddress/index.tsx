@@ -1,5 +1,6 @@
-import React from "react";
+import { GoogleApiWrapper } from "google-maps-react";
 
-const R = () => <span>fake</span>;
-
-export default R;
+import Container from "./Container";
+export default GoogleApiWrapper({
+    apiKey: "AIzaSyD-eLlEKDkOZBeh-s1CBRdlpbWrgNAtkyw",
+})(Container);
