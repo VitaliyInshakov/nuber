@@ -1,5 +1,2 @@
-import React from "react";
-
-const R = () => <span>fake</span>;
-
-export default R;
+import Container from "./Container";
+export default Container;

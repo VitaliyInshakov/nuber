@@ -82,7 +82,8 @@ const Presenter: React.FC<IProps> = ({
                         name={place!.name}
                         address={place!.address}
                     />
-                ))}
+                ))
+            }
             <SLink to={"/places"}>Go to Places</SLink>
             <FakeLink onClick={logUserOut}>Log Out</FakeLink>
         </Container>
