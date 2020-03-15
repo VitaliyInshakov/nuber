@@ -1,6 +1,8 @@
 import { GoogleApiWrapper } from "google-maps-react";
 
+import { MAPS_KEY } from "../../keys";
 import Container from "./Container";
+
 export default GoogleApiWrapper({
-    apiKey: "AIzaSyD-eLlEKDkOZBeh-s1CBRdlpbWrgNAtkyw",
+    apiKey: MAPS_KEY,
 })(Container);
