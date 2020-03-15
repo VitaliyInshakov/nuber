@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-const Place = styled.div`
+const Presenter = styled.div`
   margin: 15px 0;
   display: flex;
   align-items: center;
@@ -31,16 +31,22 @@ interface IProps {
     fav: boolean;
     name: string;
     address: string;
+    onStartPress: any;
 }
 
-const PlacePresenter: React.FC<IProps> = ({ fav, name, address }) => (
-    <Place>
-        <Icon>{fav ? "★" : "✩"}</Icon>
+const PlacePresenter: React.FC<IProps> = ({
+    fav,
+    name,
+    address,
+    onStartPress,
+}) => (
+    <Presenter>
+        <Icon onClick={onStartPress}>{fav ? "★" : "✩"}</Icon>
         <Container>
             <Name>{name}</Name>
             <Address>{address}</Address>
         </Container>
-    </Place>
+    </Presenter>
 );
 
 export default PlacePresenter;

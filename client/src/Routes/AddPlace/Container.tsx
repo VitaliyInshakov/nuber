@@ -61,7 +61,7 @@ const Container: React.FC<RouteComponentProps<any>> = ({ history }) => {
             address={state.address}
             name={state.name}
             loading={loading}
-            onSubmit={addPlaceFn()}
+            onSubmit={addPlaceFn}
         />
     );
 };

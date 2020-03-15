@@ -78,6 +78,7 @@ const Presenter: React.FC<IProps> = ({
                 places.map(place => (
                     <Place
                         key={place!.id}
+                        id={place!.id}
                         fav={place!.isFavorite}
                         name={place!.name}
                         address={place!.address}
