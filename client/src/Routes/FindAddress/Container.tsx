@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 
-import { reverseGeoCode } from "../../mapHelpers";
+import { geoCode, reverseGeoCode } from "../../mapHelpers";
 import Presenter from "./Presenter";
 
 interface IState {
@@ -37,6 +37,7 @@ const Container: React.FC<any> = (props) => {
             lng: longitude,
         }));
         loadMap(latitude, longitude);
+        reverseGeoCodeAddress(latitude, longitude);
     };
 
     const handleGeoError = (): void => {
@@ -52,6 +53,7 @@ const Container: React.FC<any> = (props) => {
                 lng,
             },
             disableDefaultUI: true,
+            minZoom: 8,
             zoom: 11,
         };
 
@@ -59,16 +61,18 @@ const Container: React.FC<any> = (props) => {
         map.addListener("dragend", handleDragEnd);
     };
 
-    const handleDragEnd = async() => {
+    const handleDragEnd = () => {
         const newCenter = map.getCenter();
         const lat = newCenter.lat();
         const lng = newCenter.lng();
-        const reversedAddress = await reverseGeoCode(lat, lng);
-        setState({
+
+        setState(prevState => ({
+            ...prevState,
             lat,
             lng,
-            address: reversedAddress,
-        });
+        }));
+
+        reverseGeoCodeAddress(lat, lng);
     };
 
     const onInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -80,8 +84,30 @@ const Container: React.FC<any> = (props) => {
         }));
     };
 
-    const onInputBlur = () => {
-        console.log("Address updated");
+    const onInputBlur = async() => {
+        const result = await geoCode(state.address);
+        if (result) {
+            const { lat, lng, formatted_address: formattedAddress } = result;
+
+            setState({
+                address: formattedAddress,
+                lat,
+                lng,
+            });
+
+            map.panTo({ lat, lng });
+        }
+    };
+
+    const reverseGeoCodeAddress = async(lat: number, lng: number) => {
+        const reversedAddress = await reverseGeoCode(lat, lng);
+
+        if(reversedAddress) {
+            setState(prevState => ({
+                ...prevState,
+                address: reversedAddress,
+            }));
+        }
     };
 
     return (
