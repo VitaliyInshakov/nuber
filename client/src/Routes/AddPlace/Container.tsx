@@ -15,12 +15,13 @@ interface IState {
     lng: number;
 }
 
-const Container: React.FC<RouteComponentProps<any>> = ({ history }) => {
+const Container: React.FC<RouteComponentProps<any>> = (props) => {
+    const { location: { state: locationState = {} } = {} } = props;
     const [state, setState] = useState<IState>({
-        address: "",
+        address: (locationState as any).address || "",
         name: "",
-        lat: 0,
-        lng: 0,
+        lat: (locationState as any).lat || 0,
+        lng: (locationState as any).lng || 0,
     });
 
     const [addPlaceFn, { loading }] = useMutation<addPlace, addPlaceVariables>(ADD_PLACE, {
@@ -38,7 +39,7 @@ const Container: React.FC<RouteComponentProps<any>> = ({ history }) => {
             if (AddPlace.ok) {
                 toast.success("Place added!");
                 setTimeout(() => {
-                    history.push("/places");
+                    props.history.push("/places");
                 }, 2000);
             } else {
                 toast.error(AddPlace.error);

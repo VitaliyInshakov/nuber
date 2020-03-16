@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+import { RouteComponentProps } from "react-router-dom";
 
 import { geoCode, reverseGeoCode } from "../../mapHelpers";
 import Presenter from "./Presenter";
@@ -10,8 +11,11 @@ interface IState {
     address: string;
 }
 
-const Container: React.FC<any> = (props) => {
-    // @ts-ignore
+interface IProps extends RouteComponentProps<any> {
+    google: any;
+}
+
+const Container: React.FC<IProps> = (props) => {
     const [state, setState] = useState<IState>({
         lat: 0,
         lng: 0,
@@ -110,12 +114,26 @@ const Container: React.FC<any> = (props) => {
         }
     };
 
+    const onPickPlace = () => {
+        const { address, lat, lng } = state;
+        const { history } = props;
+        history.push({
+            pathname: "/add-place",
+            state: {
+                address,
+                lat,
+                lng
+            }
+        });
+    };
+
     return (
         <Presenter
             mapRef={mapRef}
             address={state.address}
             onInputChange={onInputChange}
             onInputBlur={onInputBlur}
+            onPickPlace={onPickPlace}
         />
     );
 };
