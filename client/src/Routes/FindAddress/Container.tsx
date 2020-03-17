@@ -32,7 +32,7 @@ const Container: React.FC<IProps> = (props) => {
         );
     }, []);
 
-    const handleGeoSuccess = (position: Position): void => {
+    const handleGeoSuccess: PositionCallback = (position: Position): void => {
         const { coords: { latitude, longitude } } = position;
 
         setState(prevState => ({
@@ -44,7 +44,7 @@ const Container: React.FC<IProps> = (props) => {
         reverseGeoCodeAddress(latitude, longitude);
     };
 
-    const handleGeoError = (): void => {
+    const handleGeoError: PositionErrorCallback = (): void => {
         console.log("No location");
     };
 
