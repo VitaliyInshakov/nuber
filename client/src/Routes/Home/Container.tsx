@@ -18,7 +18,7 @@ interface IState {
     toLng: number;
     distance?: string;
     duration?: string;
-    price?: string;
+    price?: number;
 }
 
 interface IProps extends RouteComponentProps<any> {
