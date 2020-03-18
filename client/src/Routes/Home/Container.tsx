@@ -16,9 +16,9 @@ interface IState {
     toAddress: string;
     toLat: number;
     toLng: number;
-    distance?: string;
+    distance: string;
     duration?: string;
-    price?: number;
+    price?: string;
 }
 
 interface IProps extends RouteComponentProps<any> {
@@ -33,6 +33,9 @@ const Container: React.FC<IProps> = (props) => {
         toAddress: "",
         toLat: 0,
         toLng: 0,
+        duration: undefined,
+        distance: "",
+        price: undefined,
     });
     const mapRef = useRef(null);
 
@@ -190,24 +193,41 @@ const Container: React.FC<IProps> = (props) => {
             travelMode: google.maps.TravelMode.DRIVING
         };
 
-        directionService.route(directionsOptions, (result, status) => {
-            if (status === google.maps.DirectionsStatus.OK) {
-                const { routes } = result;
-                const {
-                    distance: { text: distance },
-                    duration: { text: duration }
-                } = routes[0].legs[0];
-                setState(prevState => ({
-                    ...prevState,
-                    distance,
-                    duration
-                }));
-                directions.setDirections(result);
-                directions.setMap(map);
-            } else {
-                toast.error("There is no route there, you have to ");
-            }
-        });
+        directionService.route(directionsOptions, handleRouteRequest);
+    };
+
+    const handleRouteRequest = (
+        result: google.maps.DirectionsResult,
+        status: google.maps.DirectionsStatus,
+    ): void => {
+        if (status === google.maps.DirectionsStatus.OK) {
+            const { routes } = result;
+            const {
+                distance: { text: distance },
+                duration: { text: duration }
+            } = routes[0].legs[0];
+            directions.setDirections(result);
+            directions.setMap(map);
+
+            setState(prevState => ({
+                ...prevState,
+                distance,
+                duration
+            }));
+            setPrice();
+        } else {
+            toast.error("There is no route there, you have to ");
+        }
+    };
+
+    const setPrice = (): void => {
+        const { distance } = state;
+        if (distance) {
+            setState(prevState => ({
+                ...prevState,
+                price: Number(parseFloat(distance.replace(",", ".")) * 3).toFixed(2),
+            }));
+        }
     };
 
     return <Presenter
@@ -218,6 +238,7 @@ const Container: React.FC<IProps> = (props) => {
         toAddress={state.toAddress}
         onInputChange={onInputChange}
         onAddressSubmit={onAddressSubmit}
+        price={state.price}
     />;
 };
 
