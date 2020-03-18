@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useMutation } from "@apollo/react-hooks";
 import ReactDOM from "react-dom";
 import { toast } from "react-toastify";
 
 import { USER_PROFILE } from "../../sharedQueries";
-import { userProfile } from "../../types/api";
+import { REPORT_LOCATION } from "./Queries";
+import { reportMovement, reportMovementVariables, userProfile } from "../../types/api";
 import { geoCode } from "../../mapHelpers";
 import Presenter from "./Presenter";
 
@@ -52,6 +53,8 @@ const Container: React.FC<IProps> = (props) => {
     }, []);
 
     const { loading } = useQuery<userProfile>(USER_PROFILE);
+
+    const [reportLocation] = useMutation<reportMovement, reportMovementVariables>(REPORT_LOCATION);
 
     const toggleMenu = (): void => {
         setState(prevState => ({
@@ -118,6 +121,12 @@ const Container: React.FC<IProps> = (props) => {
 
         userMarker.setPosition({ lat: latitude, lng: longitude });
         map.panTo({ lat: latitude, lng: longitude });
+        reportLocation({
+            variables: {
+                lat: parseFloat(latitude.toFixed(10)),
+                lng: parseFloat(longitude.toFixed(10)),
+            },
+        });
     };
 
     const handleGeoWatchError = (): void => {
