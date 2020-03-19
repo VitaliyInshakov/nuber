@@ -5,8 +5,8 @@ import ReactDOM from "react-dom";
 import { toast } from "react-toastify";
 
 import { USER_PROFILE } from "../../sharedQueries";
-import { REPORT_LOCATION } from "./Queries";
-import { reportMovement, reportMovementVariables, userProfile } from "../../types/api";
+import {GET_NEARBY_DRIVERS, REPORT_LOCATION} from "./Queries";
+import {getDrivers, reportMovement, reportMovementVariables, userProfile} from "../../types/api";
 import { geoCode } from "../../mapHelpers";
 import Presenter from "./Presenter";
 
@@ -44,6 +44,7 @@ const Container: React.FC<IProps> = (props) => {
     let userMarker: google.maps.Marker;
     let toMarker: google.maps.Marker;
     let directions: google.maps.DirectionsRenderer;
+    let drivers: google.maps.Marker[] = [];
 
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(
@@ -52,7 +53,56 @@ const Container: React.FC<IProps> = (props) => {
         );
     }, []);
 
-    const { loading } = useQuery<userProfile>(USER_PROFILE);
+    const { loading, data } = useQuery<userProfile>(USER_PROFILE);
+
+    const handleNearbyDrivers = (data: {} | getDrivers) => {
+        if ("GetNearbyDrivers" in data) {
+            const { GetNearbyDrivers: { drivers: nearDrivers, ok } } = data;
+
+            if (ok && nearDrivers) {
+                for (const driver of nearDrivers) {
+                    if (driver && driver.lastLat && driver.lastLng) {
+                        const existingDriver: google.maps.Marker | undefined = drivers.find(
+                        (driverMarker: google.maps.Marker) => {
+                            const markerID = driverMarker.get("ID");
+                            return markerID === driver.id;
+                        });
+
+                        if (existingDriver) {
+                            existingDriver.setPosition({
+                                lat: driver.lastLat,
+                                lng: driver.lastLng
+                            });
+                            existingDriver.setMap(map);
+                        } else {
+                            const markerOptions: google.maps.MarkerOptions = {
+                                icon: {
+                                    path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+                                    scale: 5
+                                },
+                                position: {
+                                    lat: driver.lastLat,
+                                    lng: driver.lastLng
+                                }
+                            };
+                            const newMarker: google.maps.Marker = new google.maps.Marker(
+                                markerOptions
+                            );
+                            drivers.push(newMarker);
+                            newMarker.set("ID", driver.id);
+                            newMarker.setMap(map);
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    useQuery<getDrivers>(GET_NEARBY_DRIVERS, {
+        pollInterval: 1000,
+        skip: (data && data.GetMyProfile && data.GetMyProfile.user && data.GetMyProfile.user.isDriving) || false,
+        onCompleted: handleNearbyDrivers,
+    });
 
     const [reportLocation] = useMutation<reportMovement, reportMovementVariables>(REPORT_LOCATION);
 
@@ -81,6 +131,10 @@ const Container: React.FC<IProps> = (props) => {
     const loadMap = (lat, lng): void => {
         const maps = props.google.maps;
         const mapNode = ReactDOM.findDOMNode(mapRef.current);
+        if (!mapNode) {
+            loadMap(lat, lng);
+            return;
+        }
         const mapConfig: google.maps.MapOptions = {
             center: {
                 lat,
@@ -225,7 +279,7 @@ const Container: React.FC<IProps> = (props) => {
             }));
             setPrice();
         } else {
-            toast.error("There is no route there, you have to ");
+            toast.error("There is no route there, you have to swim");
         }
     };
 
@@ -248,6 +302,7 @@ const Container: React.FC<IProps> = (props) => {
         onInputChange={onInputChange}
         onAddressSubmit={onAddressSubmit}
         price={state.price}
+        data={data}
     />;
 };
 

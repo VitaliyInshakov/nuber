@@ -6,6 +6,7 @@ import styled from "styled-components";
 import Menu from "../../Components/Menu";
 import AddressBar from "../../Components/AddressBar";
 import Button from "../../Components/Button";
+import { userProfile } from "../../types/api";
 
 const Container = styled.div``;
 
@@ -55,6 +56,7 @@ interface IProps {
     onAddressSubmit: () => void;
     onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     price?: string;
+    data?: userProfile;
 }
 
 const Presenter: React.FC<IProps> = ({
@@ -66,6 +68,7 @@ const Presenter: React.FC<IProps> = ({
     onInputChange,
     onAddressSubmit,
     price,
+    data: { GetMyProfile: { user = null } = {} } = {},
 }) => (
     <Container>
         <Helmet>
@@ -84,12 +87,21 @@ const Presenter: React.FC<IProps> = ({
             }}
         >
             {!loading && <MenuButton onClick={toggleMenu}>|||</MenuButton>}
-            <AddressBar
-                name={"toAddress"}
-                onChange={onInputChange}
-                value={toAddress}
-                onBlur={null}
-            />
+            {user && !user.isDriving &&
+                <>
+                    <AddressBar
+                        name={"toAddress"}
+                        onChange={onInputChange}
+                        value={toAddress}
+                        onBlur={null}
+                    />
+                    <ExtendedButton
+                        onClick={onAddressSubmit}
+                        disabled={toAddress === ""}
+                        value={price ? "Change address" : "Pick Address"}
+                    />
+                </>
+            }
             {price && (
                 <RequestButton
                     onClick={onAddressSubmit}
@@ -97,11 +109,6 @@ const Presenter: React.FC<IProps> = ({
                     value={`Request Ride ($${price})`}
                 />
             )}
-            <ExtendedButton
-                onClick={onAddressSubmit}
-                disabled={toAddress === ""}
-                value={price ? "Change address" : "Pick Address"}
-            />
             <Map ref={mapRef}/>
         </Sidebar>
     </Container>
