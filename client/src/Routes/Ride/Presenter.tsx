@@ -87,7 +87,7 @@ const Presenter: React.FC<IProps> = ({
                 <Title>Status</Title>
                 <Data>{ride.status}</Data>
                 <Buttons>
-                    {ride.driver.id === user.id &&
+                    {ride.driver && ride.driver.id === user.id &&
                     ride.status === "ACCEPTED" && (
                         <ExtendedButton
                             value={"Picked Up"}
@@ -101,7 +101,7 @@ const Presenter: React.FC<IProps> = ({
                             }
                         />
                     )}
-                    {ride.driver.id === user.id &&
+                    {ride.driver && ride.driver.id === user.id &&
                     ride.status === "ONROUTE" && (
                         <ExtendedButton
                             value={"Finished"}
@@ -115,13 +115,11 @@ const Presenter: React.FC<IProps> = ({
                             }
                         />
                     )}
-                    {ride.driver.id === user.id ||
-                    (ride.passenger.id === user.id &&
-                        ride.status === "ACCEPTED" && (
-                            <Link to={`/chat/${ride.chatId}`}>
-                                <ExtendedButton value={"Chat"} onClick={null} />
-                            </Link>
-                        ))}
+                    {ride.status !== "REQUESTING" && (
+                        <Link to={`/chat/${ride.chatId}`}>
+                            <ExtendedButton value={"Chat"} onClick={null} />
+                        </Link>
+                    )}
                 </Buttons>
             </>
         )}

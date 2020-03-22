@@ -26,7 +26,10 @@ const Container: React.FC<RouteComponentProps<any>> = (props) => {
             if (!subscriptionData.data) {
                 return prev;
             }
-            console.log(prev, subscriptionData);
+            const { data: { RideStatusSubscription: { status } } } = subscriptionData;
+            if (status === "FINISHED") {
+                window.location.href = "/";
+            }
         }
     };
 
@@ -34,9 +37,7 @@ const Container: React.FC<RouteComponentProps<any>> = (props) => {
 
     const { data: userData } = useQuery<userProfile>(USER_PROFILE);
 
-    const [updateRideFn] = useMutation<updateRide, updateRideVariables>(UPDATE_RIDE_STATUS, {
-        refetchQueries: [{ query: GET_RIDE }],
-    });
+    const [updateRideFn] = useMutation<updateRide, updateRideVariables>(UPDATE_RIDE_STATUS);
 
     return <Presenter
         userData={userData}

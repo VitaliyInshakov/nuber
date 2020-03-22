@@ -17,7 +17,10 @@ const resolvers: Resolvers = {
                 try {
                     let ride: Ride | undefined;
                     if (args.status === "ACCEPTED") {
-                        ride = await Ride.findOne({ id: args.rideId, status: "REQUESTING" });
+                        ride = await Ride.findOne(
+                            { id: args.rideId, status: "REQUESTING" },
+                            {relations: ["passenger", "driver"]},
+                        );
                         if (ride) {
                             ride.driver = user;
                             user.isTaken = true;
@@ -32,7 +35,10 @@ const resolvers: Resolvers = {
                             ride.save();
                         }
                     } else {
-                        ride = await Ride.findOne({ id: args.rideId, driver: user });
+                        ride = await Ride.findOne(
+                            { id: args.rideId, driver: user },
+                            {relations: ["passenger", "driver"]},
+                        );
                     }
                     if (ride) {
                         ride.status = args.status;
