@@ -12,13 +12,14 @@ const resolvers: Resolvers = {
       { req },
     ): Promise<UpdateProfileResponse> => {
       const user: User = req.user;
-      const notNull = cleanNullArgs(args);
+      const notNull: any = cleanNullArgs(args);
+      if (notNull.password) {
+        user.password = notNull.password;
+        user.save();
+        delete notNull.password;
+      }
       
       try {
-        if (args.password !== null) {
-          user.password = args.password;
-          user.save();
-        }
         await User.update({ id: user.id }, { ...notNull });
         return {
           ok: true,
@@ -32,6 +33,6 @@ const resolvers: Resolvers = {
       }
     })
   }
-}
+};
 
 export default resolvers;

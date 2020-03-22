@@ -6,7 +6,8 @@ import styled from "styled-components";
 import Menu from "../../Components/Menu";
 import AddressBar from "../../Components/AddressBar";
 import Button from "../../Components/Button";
-import { userProfile } from "../../types/api";
+import RidePopUp from "../../Components/RidePopUp";
+import { userProfile, getRides } from "../../types/api";
 
 const Container = styled.div``;
 
@@ -58,6 +59,8 @@ interface IProps {
     price?: string;
     data?: userProfile;
     requestRideFn?: any;
+    acceptRideFn?: any;
+    nearbyRide?: getRides;
 }
 
 const Presenter: React.FC<IProps> = ({
@@ -70,7 +73,9 @@ const Presenter: React.FC<IProps> = ({
     onAddressSubmit,
     price,
     data: { GetMyProfile: { user = null } = {} } = {},
+    nearbyRide: { GetNearbyRide: { ride = null } = {} } = {},
     requestRideFn,
+    acceptRideFn,
 }) => (
     <Container>
         <Helmet>
@@ -109,6 +114,18 @@ const Presenter: React.FC<IProps> = ({
                     onClick={requestRideFn}
                     disabled={toAddress === ""}
                     value={`Request Ride ($${price})`}
+                />
+            )}
+            {ride && (
+                <RidePopUp
+                    id={ride.id}
+                    pickUpAddress={ride.pickUpAddress}
+                    dropOffAddress={ride.dropOffAddress}
+                    price={ride.price}
+                    distance={ride.distance}
+                    passengerName={ride.passenger.fullName!}
+                    passengerPhoto={ride.passenger.profilePhoto!}
+                    acceptRideFn={acceptRideFn}
                 />
             )}
             <Map ref={mapRef}/>

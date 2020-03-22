@@ -5,9 +5,18 @@ import ReactDOM from "react-dom";
 import { toast } from "react-toastify";
 
 import { USER_PROFILE } from "../../sharedQueries";
-import { GET_NEARBY_DRIVERS, REPORT_LOCATION, REQUEST_RIDE } from "./Queries";
 import {
+    GET_NEARBY_DRIVERS,
+    GET_NEARBY_RIDE,
+    REPORT_LOCATION,
+    REQUEST_RIDE,
+    ACCEPT_RIDE,
+} from "./Queries";
+import {
+    acceptRide,
+    acceptRideVariables,
     getDrivers,
+    getRides,
     reportMovement,
     reportMovementVariables,
     requestRide,
@@ -28,6 +37,7 @@ interface IState {
     duration?: string;
     price?: string;
     fromAddress: string;
+    isDriving: boolean;
 }
 
 interface IProps extends RouteComponentProps<any> {
@@ -46,6 +56,7 @@ const Container: React.FC<IProps> = (props) => {
         distance: "",
         price: undefined,
         fromAddress: "",
+        isDriving: false,
     });
     const mapRef = useRef(null);
 
@@ -62,7 +73,20 @@ const Container: React.FC<IProps> = (props) => {
         );
     }, []);
 
-    const { loading, data } = useQuery<userProfile>(USER_PROFILE);
+    const handleProfileQuery = (data: userProfile): void => {
+        const { GetMyProfile } = data;
+        if (GetMyProfile.user) {
+            const { user: { isDriving } } = GetMyProfile;
+            setState(prevState => ({
+                ...prevState,
+                isDriving,
+            }));
+        }
+    };
+
+    const { loading, data } = useQuery<userProfile>(USER_PROFILE, {
+        onCompleted: handleProfileQuery,
+    });
 
     const handleNearbyDrivers = (data: {} | getDrivers) => {
         if ("GetNearbyDrivers" in data) {
@@ -109,11 +133,24 @@ const Container: React.FC<IProps> = (props) => {
 
     useQuery<getDrivers>(GET_NEARBY_DRIVERS, {
         pollInterval: 1000,
-        skip: (data && data.GetMyProfile && data.GetMyProfile.user && data.GetMyProfile.user.isDriving) || false,
+        skip: state.isDriving,
         onCompleted: handleNearbyDrivers,
     });
 
+    const { data: nearbyRide } = useQuery<getRides>(GET_NEARBY_RIDE, {
+        skip: !state.isDriving,
+    });
+
     const [reportLocation] = useMutation<reportMovement, reportMovementVariables>(REPORT_LOCATION);
+
+    const handleRideRequest = (data: requestRide): void => {
+        const { RequestRide } = data;
+        if (RequestRide.ok) {
+            toast.success("Drive requested, finding a driver");
+        } else {
+            toast.error(RequestRide.error);
+        }
+    };
 
     const [requestRideFn] = useMutation<requestRide, requestRideVariables>(REQUEST_RIDE, {
         variables: {
@@ -127,7 +164,10 @@ const Container: React.FC<IProps> = (props) => {
             pickUpLng: state.lng,
             price: +state.price! || 0,
         },
+        onCompleted: handleRideRequest,
     });
+
+    const [acceptRideFn] = useMutation<acceptRide, acceptRideVariables>(ACCEPT_RIDE);
 
     const toggleMenu = (): void => {
         setState(prevState => ({
@@ -317,7 +357,7 @@ const Container: React.FC<IProps> = (props) => {
         }
     };
 
-    const getFromAddress = async (lat: number, lng: number): void => {
+    const getFromAddress = async (lat: number, lng: number) => {
         const address = await reverseGeoCode(lat, lng);
         if (address) {
             setState(prevState => ({
@@ -338,6 +378,8 @@ const Container: React.FC<IProps> = (props) => {
         price={state.price}
         data={data}
         requestRideFn={requestRideFn}
+        nearbyRide={nearbyRide}
+        acceptRideFn={acceptRideFn}
     />;
 };
 
