@@ -3,6 +3,6 @@ import styled from "styled-components";
 
 const Container = styled.div``;
 
-const Presenter: React.FC = () => <Container>Chat</Container>;
+const Presenter: React.FC = () => <Container>Ride</Container>;
 
 export default Presenter;

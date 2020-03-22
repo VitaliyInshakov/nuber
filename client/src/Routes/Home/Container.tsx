@@ -169,6 +169,7 @@ const Container: React.FC<IProps> = (props) => {
         const { RequestRide } = data;
         if (RequestRide.ok) {
             toast.success("Drive requested, finding a driver");
+            props.history.push(`/ride/${RequestRide.ride!.id}`);
         } else {
             toast.error(RequestRide.error);
         }
@@ -189,7 +190,16 @@ const Container: React.FC<IProps> = (props) => {
         onCompleted: handleRideRequest,
     });
 
-    const [acceptRideFn] = useMutation<acceptRide, acceptRideVariables>(ACCEPT_RIDE);
+    const handleRideAcceptance = (data: acceptRide) => {
+        const { UpdateRideStatus } = data;
+        if (UpdateRideStatus.ok) {
+            props.history.push(`/ride/${UpdateRideStatus.rideId}`);
+        }
+    };
+
+    const [acceptRideFn] = useMutation<acceptRide, acceptRideVariables>(ACCEPT_RIDE, {
+        onCompleted: handleRideAcceptance,
+    });
 
     const toggleMenu = (): void => {
         setState(prevState => ({
