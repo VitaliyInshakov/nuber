@@ -57,6 +57,7 @@ interface IProps {
     onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     price?: string;
     data?: userProfile;
+    requestRideFn?: any;
 }
 
 const Presenter: React.FC<IProps> = ({
@@ -69,6 +70,7 @@ const Presenter: React.FC<IProps> = ({
     onAddressSubmit,
     price,
     data: { GetMyProfile: { user = null } = {} } = {},
+    requestRideFn,
 }) => (
     <Container>
         <Helmet>
@@ -104,7 +106,7 @@ const Presenter: React.FC<IProps> = ({
             }
             {price && (
                 <RequestButton
-                    onClick={onAddressSubmit}
+                    onClick={requestRideFn}
                     disabled={toAddress === ""}
                     value={`Request Ride ($${price})`}
                 />

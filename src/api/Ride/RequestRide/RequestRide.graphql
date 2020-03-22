@@ -15,5 +15,5 @@ type Mutation {
         price: Float!
         distance: String!
         duration: String!
-    ): ReportMovementResponse!
+    ): RequestRideResponse!
 }

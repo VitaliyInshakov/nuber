@@ -5,9 +5,16 @@ import ReactDOM from "react-dom";
 import { toast } from "react-toastify";
 
 import { USER_PROFILE } from "../../sharedQueries";
-import {GET_NEARBY_DRIVERS, REPORT_LOCATION} from "./Queries";
-import {getDrivers, reportMovement, reportMovementVariables, userProfile} from "../../types/api";
-import { geoCode } from "../../mapHelpers";
+import { GET_NEARBY_DRIVERS, REPORT_LOCATION, REQUEST_RIDE } from "./Queries";
+import {
+    getDrivers,
+    reportMovement,
+    reportMovementVariables,
+    requestRide,
+    requestRideVariables,
+    userProfile
+} from "../../types/api";
+import { geoCode, reverseGeoCode } from "../../mapHelpers";
 import Presenter from "./Presenter";
 
 interface IState {
@@ -20,6 +27,7 @@ interface IState {
     distance: string;
     duration?: string;
     price?: string;
+    fromAddress: string;
 }
 
 interface IProps extends RouteComponentProps<any> {
@@ -37,6 +45,7 @@ const Container: React.FC<IProps> = (props) => {
         duration: undefined,
         distance: "",
         price: undefined,
+        fromAddress: "",
     });
     const mapRef = useRef(null);
 
@@ -106,6 +115,20 @@ const Container: React.FC<IProps> = (props) => {
 
     const [reportLocation] = useMutation<reportMovement, reportMovementVariables>(REPORT_LOCATION);
 
+    const [requestRideFn] = useMutation<requestRide, requestRideVariables>(REQUEST_RIDE, {
+        variables: {
+            distance: state.distance,
+            dropOffAddress: state.toAddress,
+            dropOffLat: state.toLat,
+            dropOffLng: state.toLng,
+            duration: state.duration || "",
+            pickUpAddress: state.fromAddress,
+            pickUpLat: state.lat,
+            pickUpLng: state.lng,
+            price: +state.price! || 0,
+        },
+    });
+
     const toggleMenu = (): void => {
         setState(prevState => ({
             ...prevState,
@@ -121,6 +144,7 @@ const Container: React.FC<IProps> = (props) => {
             lat: latitude,
             lng: longitude,
         }));
+        getFromAddress(latitude, longitude);
         loadMap(latitude, longitude);
     };
 
@@ -293,6 +317,16 @@ const Container: React.FC<IProps> = (props) => {
         }
     };
 
+    const getFromAddress = async (lat: number, lng: number): void => {
+        const address = await reverseGeoCode(lat, lng);
+        if (address) {
+            setState(prevState => ({
+                ...prevState,
+                fromAddress: address,
+            }));
+        }
+    };
+
     return <Presenter
         isMenuOpen={state.isMenuOpen}
         toggleMenu={toggleMenu}
@@ -303,6 +337,7 @@ const Container: React.FC<IProps> = (props) => {
         onAddressSubmit={onAddressSubmit}
         price={state.price}
         data={data}
+        requestRideFn={requestRideFn}
     />;
 };
 
