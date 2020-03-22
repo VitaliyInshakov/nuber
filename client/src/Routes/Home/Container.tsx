@@ -3,6 +3,7 @@ import { RouteComponentProps } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import ReactDOM from "react-dom";
 import { toast } from "react-toastify";
+import { SubscribeToMoreOptions } from "apollo-client";
 
 import { USER_PROFILE } from "../../sharedQueries";
 import {
@@ -11,6 +12,7 @@ import {
     REPORT_LOCATION,
     REQUEST_RIDE,
     ACCEPT_RIDE,
+    SUBSCRIBE_NEARBY_RIDES,
 } from "./Queries";
 import {
     acceptRide,
@@ -137,9 +139,29 @@ const Container: React.FC<IProps> = (props) => {
         onCompleted: handleNearbyDrivers,
     });
 
-    const { data: nearbyRide } = useQuery<getRides>(GET_NEARBY_RIDE, {
+    const { data: nearbyRide, subscribeToMore } = useQuery<getRides>(GET_NEARBY_RIDE, {
         skip: !state.isDriving,
     });
+
+    const handleSubscriptionUpdate = (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+            return prev;
+        }
+        const newObject = Object.assign({}, prev, {
+            GetNearbyRide: {
+                ...prev.GetNearbyRide,
+                ride: subscriptionData.data.NearbyRideSubscription
+            }
+        });
+        return newObject;
+    };
+
+    const rideSubscriptionOptions: SubscribeToMoreOptions = {
+        document: SUBSCRIBE_NEARBY_RIDES,
+        updateQuery: handleSubscriptionUpdate
+    };
+
+    state.isDriving && subscribeToMore(rideSubscriptionOptions);
 
     const [reportLocation] = useMutation<reportMovement, reportMovementVariables>(REPORT_LOCATION);
 
