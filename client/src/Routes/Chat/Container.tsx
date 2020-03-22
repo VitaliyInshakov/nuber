@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/react-hooks";
+import { SubscribeToMoreOptions } from "apollo-client";
 
 import { USER_PROFILE } from "../../sharedQueries";
 import {
@@ -12,7 +13,7 @@ import {
 } from "../../types/api";
 
 import Presenter from "./Presenter";
-import { GET_CHAT, SEND_MESSAGE } from "./Queries";
+import { GET_CHAT, SEND_MESSAGE, SUBSCRIBE_TO_MESSAGES } from "./Queries";
 
 interface IState {
     message: string;
@@ -28,7 +29,30 @@ const Container: React.FC<RouteComponentProps<any>> = (props) => {
     }
 
     const { data: userData } = useQuery<userProfile>(USER_PROFILE);
-    const { data, loading } = useQuery<getChat, getChatVariables>(GET_CHAT);
+    const { data, loading, subscribeToMore } = useQuery<getChat, getChatVariables>(GET_CHAT);
+
+    const subscribeToMoreOptions: SubscribeToMoreOptions = {
+        document: SUBSCRIBE_TO_MESSAGES,
+        updateQuery: (prev, { subscriptionData }) => {
+            if (!subscriptionData.data) {
+                return prev;
+            }
+            const newObject = Object.assign({}, prev, {
+                GetChat: {
+                    ...prev.GetChat,
+                    chat: {
+                        ...prev.GetChat.chat,
+                        messages: [
+                            ...prev.GetChat.chat.messages,
+                            subscriptionData.data.MessageSubscription
+                        ]
+                    }
+                }
+            });
+            return newObject;
+        }
+    };
+    subscribeToMore(subscribeToMoreOptions);
 
     const [sendMessageFn] = useMutation<sendMessage, sendMessageVariables>(SEND_MESSAGE);
 
